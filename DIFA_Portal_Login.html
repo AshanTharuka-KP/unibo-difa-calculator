@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIFA Portal Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b1120;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --primary: #38bdf8; 
+            --highlight: #ec4899; 
+            --highlight-hover: #db2777;
+            --input-bg: #0f172a;
+            --success: #10b981;
+            --error: #fb7185;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .disclaimer-box {
+            background: rgba(236, 72, 153, 0.05);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            object-fit: cover; 
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin: 0 0 10px 0;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, #818cf8 50%, var(--highlight) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        label { font-weight: 600; margin-bottom: 6px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        input[type="email"] {
+            padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem;
+            background-color: var(--input-bg); color: var(--text); width: 100%;
+            font-family: 'Poppins', sans-serif; box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { outline: none; border-color: var(--primary); }
+        input.input-error { border-color: var(--error) !important; }
+
+        #email-error-msg {
+            color: var(--error);
+            font-size: 0.7rem;
+            margin-top: 5px;
+            display: none;
+            font-weight: 500;
+        }
+
+        button.main-btn {
+            background: linear-gradient(135deg, var(--highlight) 0%, var(--highlight-hover) 100%);
+            color: white; border: none; padding: 14px; font-size: 1rem; border-radius: 6px;
+            cursor: pointer; font-weight: 700; width: 100%; text-transform: uppercase; transition: 0.2s;
+            font-family: 'Poppins', sans-serif; letter-spacing: 1px; margin-top: 10px;
+        }
+
+        button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(236, 72, 153, 0.4); }
+
+        #otp-section { display: none; }
+        .otp-display { font-size: 0.85rem; color: var(--primary); margin-bottom: 20px; font-weight: 600; }
+        .success-msg { color: var(--success); font-weight: bold; margin-top: 15px; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="disclaimer-box">
+            <strong>NOTICE:</strong> This is an independent tool for academic analysis. This portal is <strong>not</strong> an official University of Bologna service and is not affiliated with the administration.
+        </div>
+
+        <div class="header">
+            <img src="https://i.ibb.co/xSg1BnGY/CCreate-a-logo-202604170446.jpg" alt="Portal Logo" class="login-logo">
+            <h1>UNIBO Portal</h1>
+        </div>
+
+        <div id="login-section">
+            <p class="subtitle">Access your DIFA analytics dashboard</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Personal Email (Gmail Recommended)</label>
+                    <input type="email" id="email" placeholder="e.g. yourname@gmail.com" required>
+                    <div id="email-error-msg">University emails (@studio.unibo.it) are blocked by filters. Please use a personal Gmail.</div>
+                </div>
+                <button type="submit" class="main-btn">Send Login Link</button>
+            </form>
+        </div>
+
+        <div id="otp-section">
+            <p class="subtitle">We sent a secure login link to your email.</p>
+            <div class="otp-display" id="user-email-display"></div>
+            <p class="success-msg">Check your inbox to complete sign-in!</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+        import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRzXPfbKNRBoCRuJahGamDIGHFyZ-6UVo",
+            authDomain: "unibo-difa-grade-calculator.firebaseapp.com",
+            projectId: "unibo-difa-grade-calculator",
+            storageBucket: "unibo-difa-grade-calculator.firebasestorage.app",
+            messagingSenderId: "378081437668",
+            appId: "1:378081437668:web:415a5c56cd236031e989f1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.requestMagicLink = function(event) {
+            event.preventDefault();
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value.toLowerCase().trim();
+            const errorDiv = document.getElementById('email-error-msg');
+            
+            // Block University Email Validation
+            if (email.endsWith('@studio.unibo.it')) {
+                emailInput.classList.add('input-error');
+                errorDiv.style.display = 'block';
+                return;
+            } else {
+                emailInput.classList.remove('input-error');
+                errorDiv.style.display = 'none';
+            }
+            
+            const actionCodeSettings = {
+                url: 'https://ashantharuka-kp.github.io/unibo-difa-calculator/', 
+                handleCodeInApp: true,
+            };
+
+            sendSignInLinkToEmail(auth, email, actionCodeSettings)
+                .then(() => {
+                    window.localStorage.setItem('emailForSignIn', email);
+                    document.getElementById('login-section').style.display = 'none';
+                    document.getElementById('otp-section').style.display = 'block';
+                    document.getElementById('user-email-display').innerText = email;
+                })
+                .catch((error) => {
+                    alert("Firebase Error: " + error.message);
+                });
+        }
+
+        if (isSignInWithEmailLink(auth, window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = window.prompt('Please provide your email for confirmation');
+            }
+
+            signInWithEmailLink(auth, email, window.location.href)
+                .then(() => {
+                    window.localStorage.removeItem('emailForSignIn');
+                    window.location.href = 'UNIBO_Grade_Calculator.html';
+                })
+                .catch((error) => {
+                    alert("Sign-in error: " + error.message);
+                });
+        }
+        
+        document.getElementById('loginForm').onsubmit = window.requestMagicLink;
+    </script>
+</body>
+</html>
